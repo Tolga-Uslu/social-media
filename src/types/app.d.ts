@@ -7,6 +7,6 @@ type AppVariables ={
 };
 
 
-export type AppEnviornment ={
+export type AppEnvironment={
     Variables:AppVariables;
 };
