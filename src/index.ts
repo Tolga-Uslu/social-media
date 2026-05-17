@@ -1,14 +1,15 @@
 import { Hono } from "hono";
-import { AppEnviornment } from "./types";
-import { contextMiddleWare } from "./middleware/context.middleware";
+import { AppEnvironment } from "./types/app";
+import { contextMiddleware } from "./middleware/context.middleware";
+import { userRoute } from "./modules/user/user.route";
 
-const app = new Hono<AppEnviornment>();
+const app = new Hono<AppEnvironment>();
 
-app.use("*",contextMiddleWare);
+app.use("*", contextMiddleware);
+app.route("/users", userRoute);
 
+export default {
+  port: Number(process.env.PORT) || 3000,
+  fetch: app.fetch,
+};
 
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
-});
-
-export default app;
