@@ -1,12 +1,12 @@
 import { PostgresJsDatabase } from "drizzle-orm/postgres-js";
+import type * as schema from "../modules/user/user.schema";
 
+export interface IContextCore {
+  db: PostgresJsDatabase<typeof schema>;
+  nowDatetime: Date;
+}
 
-type AppVariables ={
-    db:PostgresJsDatabase;
-    dateTime:()=> string;
+export type AppEnvironment = {
+  Variables: IContextCore;
 };
 
-
-export type AppEnvironment={
-    Variables:AppVariables;
-};
