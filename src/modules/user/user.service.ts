@@ -1,13 +1,25 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { IContextCore } from "../../types/app";
 import { users } from "./user.schema";
 
+const userColumns = {
+  id: users.id,
+  username: users.username,
+  name: users.name,
+  lastName: users.lastName,
+  email: users.email,
+  isDeleted: users.isDeleted,
+};
+
 export async function get({ db }: IContextCore) {
-  return db.select().from(users).where(eq(users.isDeleted, false));
+  return db.select(userColumns).from(users).where(eq(users.isDeleted, false));
 }
 
 export async function getById({ db }: IContextCore, id: string) {
-  const [user] = await db.select().from(users).where(eq(users.id, id));
+  const [user] = await db
+    .select(userColumns)
+    .from(users)
+    .where(and(eq(users.id, id), eq(users.isDeleted, false)));
   return user;
 }
 
@@ -19,7 +31,7 @@ export async function create(
   const [user] = await db
     .insert(users)
     .values({ ...data, password: hashedPassword })
-    .returning();
+    .returning(userColumns);
   return user;
 }
 
@@ -28,7 +40,11 @@ export async function update(
   id: string,
   data: { username?: string; name?: string; lastName?: string; email?: string }
 ) {
-  const [user] = await db.update(users).set(data).where(eq(users.id, id)).returning();
+  const [user] = await db
+    .update(users)
+    .set(data)
+    .where(and(eq(users.id, id),eq(users.isDeleted,false)))
+    .returning(userColumns);
   return user;
 }
 
@@ -36,7 +52,7 @@ export async function remove({ db }: IContextCore, id: string) {
   const [user] = await db
     .update(users)
     .set({ isDeleted: true })
-    .where(eq(users.id, id))
-    .returning();
+    .where(and(eq(users.id, id),eq(users.isDeleted,false)))
+    .returning(userColumns);
   return user;
 }
